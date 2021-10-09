@@ -10,7 +10,8 @@ Nginx的代理功能与负载均衡功能是最常被用到的，关于nginx的�
 	error_page 404 https://www.runnob.com; #错误页
 	proxy_intercept_errors on;    #如果被代理服务器返回的状态码为400或者大于400，设置的error_page配置起作用。默认为off。
 
-#### 2. 如果我们的代理只允许接受get，post请求方法的一种
+#### 2. 是指代理请求方式 
+如果我们的代理只允许接受get，post请求方法的一种
 
 	proxy_method get;    #支持客户端的请求方法。post/get；
 
@@ -18,9 +19,10 @@ Nginx的代理功能与负载均衡功能是最常被用到的，关于nginx的�
 
 	proxy_http_version 1.0 ; #Nginx服务器提供代理服务的http协议版本1.0，1.1，默认设置为1.0版本
 
-#### 4. 如果你的nginx服务器给2台web服务器做代理，负载均衡算法采用轮询，那么当你的一台机器web程序iis关闭，也就是说web不能访问，那么nginx服务器分发请求还是会给这台不能访问的web服务器，如果这里的响应连接时间过长，就会导致客户端的页面一直在等待响应，对用户来说体验就打打折扣，这里我们怎么避免这样的情况发生呢。这里我配张图来说明下问题。
+#### 4. 代理实例 
+如果你的nginx服务器给2台web服务器做代理，负载均衡算法采用轮询，那么当你的一台机器web程序iis关闭，也就是说web不能访问，那么nginx服务器分发请求还是会给这台不能访问的web服务器，如果这里的响应连接时间过长，就会导致客户端的页面一直在等待响应，对用户来说体验就打打折扣，这里我们怎么避免这样的情况发生呢。这里我配张图来说明下问题。
 
-
+![代理实例](https://www.runoob.com/wp-content/uploads/2018/08/398358-20160219104130363-660910928.jpg)
 
 如果负载均衡中其中web2发生这样的情况，nginx首先会去web1请求，但是nginx在配置不当的情况下会继续分发请求道web2，然后等待web2响应，直到我们的响应时间超时，才会把请求重新分发给web1，这里的响应时间如果过长，用户等待的时间就会越长。
 
@@ -31,7 +33,8 @@ Nginx的代理功能与负载均衡功能是最常被用到的，关于nginx的�
 	proxy_send_timeout 1; #nginx服务器想被代理服务器组发出write请求后，等待响应的超时间，默认为60秒。
 	proxy_ignore_client_abort on;  #客户端断网时，nginx服务器是否终端对被代理服务器的请求。默认为off。
 
-#### 5. 如果使用upstream指令配置啦一组服务器作为被代理服务器，服务器中的访问算法遵循配置的负载均衡规则，同时可以使用该指令配置在发生哪些异常情况时，将请求顺次交由下一组服务器处理。
+#### 5. proxy_next_upstream
+如果使用upstream指令配置啦一组服务器作为被代理服务器，服务器中的访问算法遵循配置的负载均衡规则，同时可以使用该指令配置在发生哪些异常情况时，将请求顺次交由下一组服务器处理。
 
 	proxy_next_upstream timeout;  #反向代理upstream中设置的服务器组，出现故障时，被代理服务器返回的状态值。
 
@@ -43,7 +46,8 @@ Nginx的代理功能与负载均衡功能是最常被用到的，关于nginx的�
 - off: 无法将请求分发给被代理的服务器。
 - http_400，....: 被代理服务器返回的状态码为400，500，502，等。
 
-#### 6. 如果你想通过http获取客户的真是ip而不是获取代理服务器的ip地址，那么要做如下的设置。
+#### 6. 获取真实ip
+如果你想通过http获取客户的真是ip而不是获取代理服务器的ip地址，那么要做如下的设置。
 
 	proxy_set_header Host $host; #只要用户在浏览器中访问的域名绑定了 VIP VIP 下面有RS；则就用$host ；host是访问URL中的域名和端口  www.taobao.com:80
 	proxy_set_header X-Real-IP $remote_addr;  #把源IP 【$remote_addr,建立HTTP连接header里面的信息】赋值给X-Real-IP;这样在代码中 $X-Real-IP来获取 源IP
@@ -51,7 +55,8 @@ Nginx的代理功能与负载均衡功能是最常被用到的，关于nginx的�
 
 关于`X-Forwarded-For`与`X-Real-IP`的一些相关文章可以查看：`HTTP` 请求头中的 `X-Forwarded-For` 。
 
-#### 7. 下面是我的一个关于代理配置的配置文件部分，仅供参考。
+#### 7. 代理配置参考
+下面是我的一个关于代理配置的配置文件部分，仅供参考。
 
 	include       mime.types;   #文件扩展名与文件类型映射表
 	default_type  application/octet-stream; #默认文件类型，默认为text/plain
@@ -122,7 +127,8 @@ nginx默认就是轮询其权重都默认为1，服务器处理请求的顺序�
 	    server 192.168.10.121:3333;
 	    ip_hash;
 	}
-5. 如果你对上面4种均衡算法不是很理解，可以查看Nginx [配置详解](https://www.runoob.com/w3cnote/nginx-setup-intro.html)，可能会更加容易理解点。
+#### 5. 关于nginx负载均衡配置
+如果你对上面4种均衡算法不是很理解，可以查看Nginx [配置详解](https://www.runoob.com/w3cnote/nginx-setup-intro.html)，可能会更加容易理解点。
 
 到这里你是不是感觉nginx的负载均衡配置特别简单与强大，那么还没完，咱们继续哈，这里扯下蛋。
 
