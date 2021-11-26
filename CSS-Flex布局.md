@@ -102,7 +102,7 @@ Webkit 内核的浏览器，必须加上`-webkit`前缀。
 	.box {
 	  flex-flow: <flex-direction> || <flex-wrap>;
 	}
-3.4 justify-content属性
+### 3.4 justify-content属性
 `justify-content`属性定义了项目在主轴上的对齐方式。
 
 
